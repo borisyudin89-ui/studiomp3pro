@@ -1,5 +1,5 @@
-appId: com.local.mp3converter
-productName: MP3 Converter
+appId: com.local.studiomp3pro
+productName: Studio MP3 PRO
 copyright: StudioMP3Pro
 directories:
   output: dist
@@ -13,12 +13,14 @@ afterPack: scripts/after-pack.js
 mac:
   category: public.app-category.music
   identity: null
+  icon: build/icon.png
   target:
     - dmg
-  artifactName: MP3-Converter-${version}-mac-${arch}.${ext}
+  artifactName: Studio-MP3-PRO-${version}-mac-${arch}.${ext}
 dmg:
   sign: false
 win:
+  icon: build/icon.png
   target:
     - portable
-  artifactName: MP3-Converter-${version}-win-${arch}.${ext}
+  artifactName: Studio-MP3-PRO-${version}-win-${arch}.${ext}

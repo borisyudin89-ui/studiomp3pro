@@ -85,11 +85,12 @@ function startApp() {
 
   function createWindow() {
     win = new BrowserWindow({
-      width: 780,
+      width: 820,
       height: 680,
-      minWidth: 560,
-      minHeight: 480,
-      title: 'MP3 Converter',
+      minWidth: 680,
+      minHeight: 560,
+      title: 'Studio MP3 PRO',
+      backgroundColor: '#111214',
       autoHideMenuBar: true,
       webPreferences: {
         preload: path.join(__dirname, '..', 'preload', 'preload.js'),
@@ -259,7 +260,7 @@ function startApp() {
     try {
       converter = new Converter(getFfmpegPath());
     } catch (e) {
-      dialog.showErrorBox('MP3 Converter', `Не найден ffmpeg: ${e.message}`);
+      dialog.showErrorBox('Studio MP3 PRO', `Не найден ffmpeg: ${e.message}`);
       app.quit();
       return;
     }

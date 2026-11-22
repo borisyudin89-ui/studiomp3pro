@@ -50,9 +50,9 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          APP=$(ls -d dist/mac*/"MP3 Converter.app")
+          APP=$(ls -d dist/mac*/"Studio MP3 PRO.app")
           echo "Запускаю: $APP"
-          SELFTEST_OUT="$RUNNER_TEMP/selftest.json" "$APP/Contents/MacOS/MP3 Converter" --selftest || true
+          SELFTEST_OUT="$RUNNER_TEMP/selftest.json" "$APP/Contents/MacOS/Studio MP3 PRO" --selftest || true
           cat "$RUNNER_TEMP/selftest.json"; echo
           grep -q '"ok":true' "$RUNNER_TEMP/selftest.json"
 
@@ -61,14 +61,14 @@ jobs:
         shell: bash
         run: |
           export SELFTEST_OUT="$RUNNER_TEMP/selftest.json"
-          "dist/win-unpacked/MP3 Converter.exe" --selftest || true
+          "dist/win-unpacked/Studio MP3 PRO.exe" --selftest || true
           cat "$SELFTEST_OUT"; echo
           grep -q '"ok":true' "$SELFTEST_OUT"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MP3-Converter-${{ matrix.name }}
+          name: Studio-MP3-PRO-${{ matrix.name }}
           path: |
             dist/*.dmg
             dist/*.exe
@@ -81,7 +81,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          pattern: MP3-Converter-*
+          pattern: Studio-MP3-PRO-*
           merge-multiple: true
           path: out
 
@@ -92,7 +92,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: MP3 Converter (сборка ${{ github.run_number }})
+          name: Studio MP3 PRO (сборка ${{ github.run_number }})
           make_latest: true
           files: |
             out/*.dmg

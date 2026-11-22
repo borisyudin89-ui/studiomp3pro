@@ -5,18 +5,24 @@ const jobs = new Map();
 let running = false;
 
 const STATUS = {
-  queued: 'в очереди',
-  running: 'конвертация',
-  done: 'готово',
-  error: 'ошибка',
-  skipped: 'пропущен',
-  cancelled: 'отменено',
+  queued: 'В очереди',
+  running: '',
+  done: 'Готово',
+  error: 'Ошибка',
+  skipped: 'Уже MP3',
+  cancelled: 'Отменено',
 };
 
 function fmtSize(bytes) {
-  if (bytes == null) return '';
+  if (bytes == null) return '—';
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} КБ`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} МБ`;
+  return `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} МБ`;
+}
+
+function splitName(name) {
+  const i = name.lastIndexOf('.');
+  if (i <= 0) return { stem: name, ext: '' };
+  return { stem: name.slice(0, i), ext: name.slice(i + 1).toUpperCase() };
 }
 
 function renderRow(job) {
@@ -26,36 +32,43 @@ function renderRow(job) {
     li = document.createElement('li');
     li.id = `job-${job.id}`;
     li.innerHTML =
-      '<div class="row-top"><span class="row-name"></span><span class="row-status"></span></div>' +
-      '<div class="row-bar"><div></div></div><div class="row-msg" hidden></div>';
+      '<div class="c-name"><span class="badge"></span><span class="row-name"></span></div>' +
+      '<div class="c-status"><span class="st-text"></span><div class="pbar"><div></div></div><span class="pct"></span></div>' +
+      '<div class="c-size"></div>';
     list.appendChild(li);
   }
   li.className = `row ${job.status}`;
+
+  const { stem, ext } = splitName(job.name);
+  const badge = li.querySelector('.badge');
+  badge.textContent = ext || '—';
+  badge.hidden = !ext;
   const nameEl = li.querySelector('.row-name');
-  nameEl.textContent = job.name;
+  nameEl.textContent = stem;
   nameEl.title = job.input;
 
-  const st = li.querySelector('.row-status');
-  st.textContent = '';
-  let text = STATUS[job.status] || job.status;
-  if (job.status === 'running') text += ` ${job.progress}%`;
-  if (job.status === 'done' && job.outSize != null) text += ` · ${fmtSize(job.outSize)}`;
-  st.append(text);
+  const cs = li.querySelector('.c-status');
+  const stText = cs.querySelector('.st-text');
+  stText.textContent = job.status === 'error' && job.error ? job.error : STATUS[job.status] || job.status;
+  stText.title = job.status === 'error' && job.error ? job.error : '';
+  cs.querySelector('.pbar > div').style.width = `${job.progress}%`;
+  cs.querySelector('.pct').textContent = `${job.progress}%`;
+
+  let reveal = cs.querySelector('.reveal');
   if (job.status === 'done' && job.output) {
-    const b = document.createElement('button');
-    b.className = 'reveal';
-    b.textContent = 'Показать в папке';
-    b.dataset.id = String(job.id);
-    st.append(b);
+    if (!reveal) {
+      reveal = document.createElement('button');
+      reveal.className = 'reveal';
+      reveal.textContent = 'Показать';
+      reveal.title = 'Показать в папке';
+      cs.appendChild(reveal);
+    }
+    reveal.dataset.id = String(job.id);
+  } else if (reveal) {
+    reveal.remove();
   }
-  li.querySelector('.row-bar > div').style.width = `${job.progress}%`;
-  const msg = li.querySelector('.row-msg');
-  if (job.status === 'error' && job.error) {
-    msg.textContent = job.error;
-    msg.hidden = false;
-  } else {
-    msg.hidden = true;
-  }
+
+  li.querySelector('.c-size').textContent = job.status === 'done' ? fmtSize(job.outSize) : '—';
 }
 
 function refresh() {
@@ -110,15 +123,13 @@ const drop = $('drop');
     drop.classList.add('over');
   })
 );
-['dragleave', 'drop'].forEach((ev) =>
-  window.addEventListener(ev, (e) => {
-    e.preventDefault();
-    if (ev === 'drop' || e.target === document.documentElement || e.relatedTarget === null) {
-      drop.classList.remove('over');
-    }
-  })
-);
+window.addEventListener('dragleave', (e) => {
+  e.preventDefault();
+  if (e.relatedTarget === null) drop.classList.remove('over');
+});
 window.addEventListener('drop', (e) => {
+  e.preventDefault();
+  drop.classList.remove('over');
   const paths = [...e.dataTransfer.files].map((f) => window.api.pathForFile(f)).filter(Boolean);
   if (paths.length) window.api.addPaths(paths);
 });
@@ -140,9 +151,11 @@ $('list').addEventListener('click', (e) => {
   const b = e.target.closest('.reveal');
   if (b) window.api.reveal(Number(b.dataset.id));
 });
-$('bitrate').addEventListener('change', (e) => window.api.setSettings({ bitrate: e.target.value }));
 
+// --- качество ---
+$('bitrate').addEventListener('change', (e) => window.api.setSettings({ bitrate: e.target.value }));
 window.api.getSettings().then((s) => {
   $('bitrate').value = s.bitrate;
 });
+
 refresh();
