@@ -1,0 +1,24 @@
+{
+  "name": "mp3-converter",
+  "productName": "MP3 Converter",
+  "version": "1.0.0",
+  "description": "Быстрый конвертер любых аудиоформатов в MP3",
+  "author": "StudioMP3Pro",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.js",
+    "dist:mac-x64": "electron-builder --mac dmg --x64 --publish never",
+    "dist:mac-arm64": "electron-builder --mac dmg --arm64 --publish never",
+    "dist:win": "electron-builder --win portable --x64 --publish never"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.0"
+  }
+}

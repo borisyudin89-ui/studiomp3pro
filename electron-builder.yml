@@ -1,0 +1,24 @@
+appId: com.local.mp3converter
+productName: MP3 Converter
+copyright: StudioMP3Pro
+directories:
+  output: dist
+files:
+  - package.json
+  - src/**/*
+asar: true
+asarUnpack:
+  - node_modules/ffmpeg-static/**
+afterPack: scripts/after-pack.js
+mac:
+  category: public.app-category.music
+  identity: null
+  target:
+    - dmg
+  artifactName: MP3-Converter-${version}-mac-${arch}.${ext}
+dmg:
+  sign: false
+win:
+  target:
+    - portable
+  artifactName: MP3-Converter-${version}-win-${arch}.${ext}
