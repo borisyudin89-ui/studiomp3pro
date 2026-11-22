@@ -74,10 +74,26 @@ jobs:
             dist/*.exe
           if-no-files-found: error
 
-      - name: Attach to release
-        if: startsWith(github.ref, 'refs/tags/v')
+  release:
+    name: release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: MP3-Converter-*
+          merge-multiple: true
+          path: out
+
+      - name: Список файлов
+        run: ls -la out
+
+      - name: Публикация релиза (прямые ссылки на скачивание)
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: build-${{ github.run_number }}
+          name: MP3 Converter (сборка ${{ github.run_number }})
+          make_latest: true
           files: |
-            dist/*.dmg
-            dist/*.exe
+            out/*.dmg
+            out/*.exe
