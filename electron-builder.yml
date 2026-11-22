@@ -22,5 +22,14 @@ dmg:
 win:
   icon: build/icon.png
   target:
-    - portable
-  artifactName: Studio-MP3-PRO-${version}-win-${arch}.${ext}
+    - nsis
+  artifactName: Studio-MP3-PRO-Setup-${version}-win-${arch}.${ext}
+nsis:
+  oneClick: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Studio MP3 PRO
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
