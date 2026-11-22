@@ -21,7 +21,7 @@ jobs:
             os: macos-15-intel
             script: dist:mac-x64
           - name: mac-apple-silicon
-            os: macos-14
+            os: macos-latest
             script: dist:mac-arm64
           - name: windows
             os: windows-latest
