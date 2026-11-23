@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#ff8f4a"/><stop offset="1" stop-color="#e0431f"/></linearGradient>
+<linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.22"/><stop offset="0.5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs><g transform="translate(512 512) scale(1.215) translate(-512 -512)">
+<rect x="100" y="100" width="824" height="824" rx="190" fill="url(#bg)"/>
+<rect x="100" y="100" width="824" height="824" rx="190" fill="url(#hl)"/>
+<rect x="103" y="103" width="818" height="818" rx="187" fill="none" stroke="#000" stroke-opacity="0.12" stroke-width="6"/>
+<text x="512" y="545" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="340" letter-spacing="-14" fill="#fff">mp3</text>
+<rect x="312" y="612" width="400" height="22" rx="11" fill="#fff" opacity="0.9"/>
+<text x="512" y="735" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="78" letter-spacing="14" fill="#fff" fill-opacity="0.95">studio pro</text>
+</g></svg>

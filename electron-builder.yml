@@ -20,7 +20,7 @@ mac:
 dmg:
   sign: false
 win:
-  icon: build/icon.png
+  icon: build/icon.ico
   target:
     - nsis
   artifactName: Studio-MP3-PRO-Setup-${version}-win-${arch}.${ext}
