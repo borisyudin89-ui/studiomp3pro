@@ -86,9 +86,10 @@ function startApp() {
   function createWindow() {
     win = new BrowserWindow({
       width: 820,
-      height: 680,
-      minWidth: 680,
-      minHeight: 560,
+      height: 325,
+      useContentSize: true,
+      minWidth: 600,
+      minHeight: 260,
       title: 'Studio MP3 PRO',
       backgroundColor: '#111214',
       autoHideMenuBar: true,

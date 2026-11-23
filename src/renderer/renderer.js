@@ -4,25 +4,37 @@ const $ = (id) => document.getElementById(id);
 const jobs = new Map();
 let running = false;
 
-const STATUS = {
-  queued: 'В очереди',
-  running: '',
-  done: 'Готово',
-  error: 'Ошибка',
-  skipped: 'Уже MP3',
-  cancelled: 'Отменено',
+const TEXT = {
+  queued: 'в очереди',
+  skipped: 'уже MP3',
+  cancelled: 'отменено',
+};
+
+// Статические иконки (без пользовательских данных, поэтому innerHTML безопасен)
+const SVG = (inner) =>
+  `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+const ICONS = {
+  done: SVG('<path d="M3 8.5l3.2 3.2L13 5"/>'),
+  running: SVG('<path d="M8 2.5a5.5 5.5 0 1 0 5.5 5.5"/>'),
+  queued: SVG('<circle cx="8" cy="8" r="5.5"/>'),
+  skipped: SVG('<circle cx="8" cy="8" r="5.5"/><path d="M5.5 8h5"/>'),
+  cancelled: SVG('<circle cx="8" cy="8" r="5.5"/><path d="M5.5 8h5"/>'),
+  error: SVG('<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.5M8 11v0"/>'),
 };
 
 function fmtSize(bytes) {
-  if (bytes == null) return '—';
+  if (bytes == null) return '';
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} КБ`;
   return `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} МБ`;
 }
 
-function splitName(name) {
-  const i = name.lastIndexOf('.');
-  if (i <= 0) return { stem: name, ext: '' };
-  return { stem: name.slice(0, i), ext: name.slice(i + 1).toUpperCase() };
+function rightText(job) {
+  switch (job.status) {
+    case 'done': return fmtSize(job.outSize);
+    case 'running': return `${job.progress}%`;
+    case 'error': return job.error || 'ошибка';
+    default: return TEXT[job.status] || job.status;
+  }
 }
 
 function renderRow(job) {
@@ -32,43 +44,42 @@ function renderRow(job) {
     li = document.createElement('li');
     li.id = `job-${job.id}`;
     li.innerHTML =
-      '<div class="c-name"><span class="badge"></span><span class="row-name"></span></div>' +
-      '<div class="c-status"><span class="st-text"></span><div class="pbar"><div></div></div><span class="pct"></span></div>' +
-      '<div class="c-size"></div>';
+      '<div class="row-main"><span class="row-ico"></span><span class="row-name"></span><span class="row-right"></span></div>' +
+      '<div class="row-bar"><div></div></div>';
     list.appendChild(li);
   }
   li.className = `row ${job.status}`;
 
-  const { stem, ext } = splitName(job.name);
-  const badge = li.querySelector('.badge');
-  badge.textContent = ext || '—';
-  badge.hidden = !ext;
+  const ico = li.querySelector('.row-ico');
+  if (ico.dataset.s !== job.status) {
+    ico.innerHTML = ICONS[job.status] || ICONS.queued;
+    ico.dataset.s = job.status;
+  }
+
   const nameEl = li.querySelector('.row-name');
-  nameEl.textContent = stem;
+  nameEl.textContent = job.name;
   nameEl.title = job.input;
 
-  const cs = li.querySelector('.c-status');
-  const stText = cs.querySelector('.st-text');
-  stText.textContent = job.status === 'error' && job.error ? job.error : STATUS[job.status] || job.status;
-  stText.title = job.status === 'error' && job.error ? job.error : '';
-  cs.querySelector('.pbar > div').style.width = `${job.progress}%`;
-  cs.querySelector('.pct').textContent = `${job.progress}%`;
+  const right = li.querySelector('.row-right');
+  right.textContent = rightText(job);
+  right.title = job.status === 'error' && job.error ? job.error : '';
 
-  let reveal = cs.querySelector('.reveal');
+  const main = li.querySelector('.row-main');
+  let reveal = main.querySelector('.reveal');
   if (job.status === 'done' && job.output) {
     if (!reveal) {
       reveal = document.createElement('button');
       reveal.className = 'reveal';
       reveal.textContent = 'Показать';
       reveal.title = 'Показать в папке';
-      cs.appendChild(reveal);
+      main.appendChild(reveal);
     }
     reveal.dataset.id = String(job.id);
   } else if (reveal) {
     reveal.remove();
   }
 
-  li.querySelector('.c-size').textContent = job.status === 'done' ? fmtSize(job.outSize) : '—';
+  li.querySelector('.row-bar > div').style.width = `${job.progress}%`;
 }
 
 function refresh() {
@@ -79,30 +90,23 @@ function refresh() {
   const errors = all.filter((j) => j.status === 'error').length;
   const avg = total ? all.reduce((s, j) => s + (j.progress || 0), 0) / total : 0;
 
+  $('drop').classList.toggle('has-items', total > 0);
+  $('list').hidden = total === 0;
   $('overallBar').style.width = `${Math.round(avg)}%`;
-  if (!total) $('summaryText').textContent = 'Список пуст';
-  else {
+
+  const summary = $('summaryText');
+  summary.hidden = total === 0;
+  if (total) {
     let t = `Готово ${finished} из ${total}`;
     if (errors) t += ` · ошибок: ${errors}`;
-    $('summaryText').textContent = t;
+    summary.textContent = t;
   }
-  $('start').disabled = running || queued === 0;
-  $('cancel').disabled = !running;
-  $('clear').disabled = running && all.every((j) => j.status === 'running');
-  $('start').textContent = running ? 'Идёт конвертация…' : 'Конвертировать';
 
-  let empty = document.getElementById('empty');
-  if (!total) {
-    if (!empty) {
-      empty = document.createElement('li');
-      empty.id = 'empty';
-      empty.className = 'empty';
-      empty.textContent = 'Добавьте файлы — они появятся здесь';
-      $('list').appendChild(empty);
-    }
-  } else if (empty) {
-    empty.remove();
-  }
+  $('clear').hidden = total === 0;
+  $('clear').disabled = running && all.every((j) => j.status === 'running');
+  $('cancel').hidden = !running;
+  $('start').disabled = running || queued === 0;
+  $('start').textContent = running ? 'Идёт конвертация…' : 'Конвертировать';
 }
 
 window.api.onJob((job) => {
@@ -134,7 +138,11 @@ window.addEventListener('drop', (e) => {
   if (paths.length) window.api.addPaths(paths);
 });
 
-$('pickFiles').addEventListener('click', () => window.api.pickFiles());
+// Клик по пустому месту поля выбирает файлы (по строкам списка и кнопкам — нет)
+drop.addEventListener('click', (e) => {
+  if (e.target.closest('.row') || e.target.closest('button')) return;
+  window.api.pickFiles();
+});
 $('pickFolder').addEventListener('click', () => window.api.pickFolder());
 $('start').addEventListener('click', () => window.api.start());
 $('cancel').addEventListener('click', () => window.api.cancel());
