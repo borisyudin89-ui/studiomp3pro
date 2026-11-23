@@ -1,15 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
 <defs>
-<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2d33"/><stop offset="1" stop-color="#121417"/></linearGradient>
-<linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7f99ff"/><stop offset="1" stop-color="#2f55f0"/></linearGradient>
+<linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#ff8f4a"/><stop offset="1" stop-color="#e0431f"/></linearGradient>
+<linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.22"/><stop offset="0.5" stop-color="#fff" stop-opacity="0"/></linearGradient>
 </defs>
-<rect x="100" y="100" width="824" height="824" rx="190" fill="url(#g)"/>
-<rect x="103" y="103" width="818" height="818" rx="187" fill="none" stroke="#ffffff" stroke-opacity="0.09" stroke-width="6"/>
-<rect x="208.0" y="427.0" width="56" height="170" rx="28.0" fill="url(#b)"/>
-<rect x="300.0" y="362.0" width="56" height="300" rx="28.0" fill="url(#b)"/>
-<rect x="392.0" y="297.0" width="56" height="430" rx="28.0" fill="url(#b)"/>
-<rect x="484.0" y="232.0" width="56" height="560" rx="28.0" fill="url(#b)"/>
-<rect x="576.0" y="297.0" width="56" height="430" rx="28.0" fill="url(#b)"/>
-<rect x="668.0" y="362.0" width="56" height="300" rx="28.0" fill="url(#b)"/>
-<rect x="760.0" y="427.0" width="56" height="170" rx="28.0" fill="url(#b)"/>
+<rect x="100" y="100" width="824" height="824" rx="190" fill="url(#bg)"/>
+<rect x="100" y="100" width="824" height="824" rx="190" fill="url(#hl)"/>
+<rect x="103" y="103" width="818" height="818" rx="187" fill="none" stroke="#000" stroke-opacity="0.12" stroke-width="6"/>
+<text x="512" y="545" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="340" letter-spacing="-14" fill="#fff">mp3</text>
+<rect x="312" y="612" width="400" height="22" rx="11" fill="#fff" opacity="0.9"/>
+<text x="512" y="735" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="78" letter-spacing="14" fill="#fff" fill-opacity="0.95">studio pro</text>
 </svg>
